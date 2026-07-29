@@ -1,0 +1,9 @@
+{
+  "name": "detourist-monorepo",
+  "private": true,
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {}
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@detourist/api-types",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "generate": "echo \"This script will run OpenAPI generator later\""
+  },
+  "devDependencies": {
+    "@detourist/eslint-config": "workspace:*",
+    "@detourist/prettier-config": "workspace:*"
+  }
+}
