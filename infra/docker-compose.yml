@@ -1,0 +1,85 @@
+# DeTourist — Local Development Infrastructure
+# Services: PostgreSQL + PostGIS, Redis, Meilisearch
+#
+# Usage:
+#   docker compose up -d          # start all services
+#   docker compose down           # stop all services
+#   docker compose down -v        # stop and destroy volumes (reset data)
+#
+# Connection details (defaults — override via .env):
+#   Postgres:    postgresql://detourist:detourist_dev@localhost:5432/detourist
+#   Redis:       redis://localhost:6379
+#   Meilisearch: http://localhost:7700  (master key: detourist_meili_dev_key)
+
+services:
+  # ── PostgreSQL + PostGIS ──────────────────────────────────────────────
+  # Primary data store. PostGIS extension is required for all geospatial
+  # queries — POI proximity, route scoring, visited-area geofencing,
+  # heatmap generation (§9, §10).
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: detourist-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-detourist}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-detourist_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-detourist}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-detourist} -d ${POSTGRES_DB:-detourist}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Redis ─────────────────────────────────────────────────────────────
+  # Used for: hot POI/session data caching, rate limiting, and as the
+  # Celery broker/result backend for async jobs (heatmap recompute,
+  # notification dispatch) (§9, §10).
+  redis:
+    image: redis:7-alpine
+    container_name: detourist-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Meilisearch ───────────────────────────────────────────────────────
+  # Lightweight full-text search for POIs. Handles typo-tolerant,
+  # instant search queries in the discovery feed (§10).
+  meilisearch:
+    image: getmeili/meilisearch:v1.8
+    container_name: detourist-meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-detourist_meili_dev_key}
+      MEILI_NO_ANALYTICS: "true"
+    ports:
+      - "${MEILI_PORT:-7700}:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  meilisearch_data:
+    driver: local
