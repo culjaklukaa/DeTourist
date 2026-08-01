@@ -5,10 +5,14 @@
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {
-    "generate": "echo \"This script will run OpenAPI generator later\""
+    "generate": "openapi-typescript ../../services/backend/openapi.json -o src/generated/api.d.ts"
   },
   "devDependencies": {
     "@detourist/eslint-config": "workspace:*",
-    "@detourist/prettier-config": "workspace:*"
+    "@detourist/prettier-config": "workspace:*",
+    "openapi-typescript": "^7.13.0"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0"
   }
 }

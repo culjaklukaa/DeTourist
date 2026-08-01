@@ -78,10 +78,10 @@ Each phase's file list shows only what's **new** since the previous phase — ev
 
 **API contract pipeline** *(backend + mobile eng)*
 
-- [ ] FastAPI OpenAPI schema exposed at `/openapi.json`
-- [ ] `openapi-typescript` script generating `packages/api-types/src/generated/`
-- [ ] `packages/api-types/src/client.ts` — thin typed fetch wrapper consumed by mobile
-- [ ] CI step regenerating types on backend schema change; fails the build on drift
+- [x] FastAPI OpenAPI schema exposed at `/openapi.json`
+- [x] `openapi-typescript` script generating `packages/api-types/src/generated/`
+- [x] `packages/api-types/src/client.ts` — thin typed fetch wrapper consumed by mobile
+- [x] CI step regenerating types on backend schema change; fails the build on drift
 
 **Data** *(data/ML eng + backend eng)*
 

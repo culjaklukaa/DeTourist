@@ -1,0 +1,71 @@
+name: API Contract
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'services/backend/**'
+      - 'packages/api-types/**'
+      - '.github/workflows/api-contract.yml'
+
+jobs:
+  check-drift:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.8.2
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v4
+      with:
+        path: services/backend/.venv
+        key: venv-${{ runner.os }}-${{ hashFiles('services/backend/poetry.lock') }}
+
+    - name: Install backend dependencies
+      working-directory: services/backend
+      run: poetry install --no-interaction
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 9
+
+    - name: Generate OpenAPI schema
+      working-directory: services/backend
+      run: poetry run python export_openapi.py
+
+    - name: Install api-types dependencies
+      working-directory: packages/api-types
+      run: pnpm install
+
+    - name: Generate TypeScript types
+      working-directory: packages/api-types
+      run: pnpm run generate
+
+    - name: Check for API drift
+      run: |
+        git add packages/api-types/src/generated/api.d.ts services/backend/openapi.json
+        if ! git diff --staged --exit-code packages/api-types/src/generated/api.d.ts services/backend/openapi.json; then
+          echo "::error::API drift detected! The generated OpenAPI schema or TypeScript types do not match the committed versions. Please run the export and generation scripts locally and commit the updated files."
+          exit 1
+        fi
