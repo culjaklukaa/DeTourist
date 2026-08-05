@@ -33,7 +33,7 @@ Each phase's file list shows only what's **new** since the previous phase — ev
 | Week | Focus                                                                                                |
 |------|------------------------------------------------------------------------------------------------------|
 | 1    | Repo scaffolded, tooling/conventions locked, infra skeleton started                                  |
-| 2    | Backend skeleton live (FastAPI + DB + custom auth); mobile skeleton live (Expo + routing)             |
+| 2    | Backend skeleton live (FastAPI + DB + custom auth); mobile skeleton live (Expo + routing)            |
 | 3    | API-contract pipeline working end-to-end; OSM ingestion pipeline built                               |
 | 4    | Design system delivered; CI green; full-stack smoke test (mobile → API → DB round trip) — phase exit |
 
@@ -41,8 +41,8 @@ Each phase's file list shows only what's **new** since the previous phase — ev
 
 **Repo & tooling** *(PM + both eng teams)*
 
-- [x] Initialize git repo; branch protection on `main`; document branching/PR conventions (feeds the CI gate design in §18)
-- [x] Scaffold the monorepo per §11: `apps/mobile`, `services/backend`, `packages/api-types`, `infra/`, `docs/` — this structure is a deliberate choice for colocation and shared CI; evaluate early whether it's earning its keep vs. a multi-repo setup
+- [ ] Initialize git repo; branch protection on `main`; document branching/PR conventions (feeds the CI gate design in §18)
+- [ ] Scaffold the monorepo per §11: `apps/mobile`, `services/backend`, `packages/api-types`, `infra/`, `docs/` — this structure is a deliberate choice for colocation and shared CI; evaluate early whether it's earning its keep vs. a multi-repo setup
 - [ ] `pnpm-workspace.yaml` linking `apps/mobile` ↔ `packages/api-types` (no Turborepo needed — single app, §11)
 - [ ] `pyproject.toml` (Poetry) for `services/backend`, deliberately outside the pnpm workspace (§11)
 - [ ] Shared lint/format config (ESLint, Prettier) across mobile + api-types
@@ -78,10 +78,10 @@ Each phase's file list shows only what's **new** since the previous phase — ev
 
 **API contract pipeline** *(backend + mobile eng)*
 
-- [x] FastAPI OpenAPI schema exposed at `/openapi.json`
-- [x] `openapi-typescript` script generating `packages/api-types/src/generated/`
-- [x] `packages/api-types/src/client.ts` — thin typed fetch wrapper consumed by mobile
-- [x] CI step regenerating types on backend schema change; fails the build on drift
+- [ ] FastAPI OpenAPI schema exposed at `/openapi.json`
+- [ ] `openapi-typescript` script generating `packages/api-types/src/generated/`
+- [ ] `packages/api-types/src/client.ts` — thin typed fetch wrapper consumed by mobile
+- [ ] CI step regenerating types on backend schema change; fails the build on drift
 
 **Data** *(data/ML eng + backend eng)*
 
@@ -114,6 +114,7 @@ N/A — this is the initial schema creation. No existing data to migrate.
 ### Risks Addressed This Phase (§14)
 
 **Mitigation implemented:**
+
 - **Cold start (no crowd data at launch)** — OSM seeding starts here so Phase 1A doesn't wait on it. CrowdIndex calibration research ensures the heuristic curves are grounded in real data, not guesses.
 
 ### Files after Phase 0
@@ -223,6 +224,7 @@ Additive schema changes only (`Visit`, `CrowdSignal`, `Route` tables). No data m
 ### Risks Addressed This Phase (§14)
 
 **Mitigation implemented:**
+
 - **Popularity-driven recommendations reproducing overtourism** — the RouteScore/landmark-tier split itself is a scoring-function decision rather than a policy overlay.
 - **GPS battery drain** — adaptive polling + geofencing implemented. *Validated on real hardware in Phase 2.*
 
@@ -256,9 +258,9 @@ Everything from Phase 0 still exists, now fully implemented rather than stubbed.
 
 ### Sprint Breakdown
 
-| Weeks | Focus                                                                                                |
-|-------|------------------------------------------------------------------------------------------------------|
-| 13–14 | MapLibre offline map packs (PMTiles pipeline + download manager); trip recap generation               |
+| Weeks | Focus                                                                                                     |
+|-------|-----------------------------------------------------------------------------------------------------------|
+| 13–14 | MapLibre offline map packs (PMTiles pipeline + download manager); trip recap generation                   |
 | 15–16 | Maestro E2E tests; load testing to 1.5s p95 target; performance tuning; integration bug bash — phase exit |
 
 ### Tasks
@@ -298,9 +300,11 @@ N/A — no schema changes. New features (offline maps, recap) consume existing d
 ### Risks Addressed This Phase (§14)
 
 **Mitigation implemented:**
+
 - **Offline map reliability** — pre-downloadable PMTiles packs + local `pmtiles://file:///` rendering. *Validated against real connectivity conditions in Phase 2.*
 
 **Risk resolved:**
+
 - **Mapbox pricing/availability** — eliminated entirely by switching to MapLibre (open-source, no licensing cost) + Protomaps PMTiles (open-source tile format) + OpenStreetMap data (open data). No vendor dependency for the map stack.
 
 ### Files after Phase 1B (new since Phase 1A)
@@ -331,9 +335,9 @@ infra/
 |------|--------------------------------------------------------------------------------------------|
 | 17   | Observability wired (self-hosted Sentry, PostHog, Grafana/Prometheus); GDPR flow finalized |
 | 18   | Security hardening pass; backup/DR configured and validated (RDS Multi-AZ, RPO/RTO drill)  |
-| 19   | Accessibility pass; localization complete; battery validation on real mid-range devices     |
-| 20   | Beta cohort recruited; beta build distributed; dashboards monitoring live                   |
-| 21–22| Beta running; weekly bug-triage cadence; iterate on beta feedback — phase exit              |
+| 19   | Accessibility pass; localization complete; battery validation on real mid-range devices    |
+| 20   | Beta cohort recruited; beta build distributed; dashboards monitoring live                  |
+| 21–22| Beta running; weekly bug-triage cadence; iterate on beta feedback — phase exit             |
 
 ### Tasks
 
@@ -389,6 +393,7 @@ N/A — no schema changes. Observability, security, and compliance are infrastru
 ### Risks Addressed This Phase (§14)
 
 **Risk validated (previously implemented, now confirmed with real data):**
+
 - **Low trust / opt-in for location access** — validated against real beta users' opt-in behavior, not just design intent.
 - **GPS battery drain** — validated on real mid-range hardware, not simulators.
 - **Offline map reliability** — stress-tested against the pilot region's actual low-connectivity pockets.
@@ -468,7 +473,7 @@ No new application code — this phase is release engineering, not feature work.
 ### Sprint Breakdown
 
 | Sprint                      | Focus                                                                                       |
-|-----------------------------|---------------------------------------------------------------------------------------------| 
+|-----------------------------|---------------------------------------------------------------------------------------------|
 | 1 (~weeks 1–2)              | `Property` model + affiliate deep-link tracking backend                                     |
 | 2 (~weeks 3–4)              | Group trips backend (`TripMember`, `InviteCode`, permissions) + mobile join flow            |
 | 3 (~weeks 5–6)              | Expense backend (PaddleOCR integration, receipt storage) + settlement algorithm             |
@@ -540,6 +545,7 @@ No new application code — this phase is release engineering, not feature work.
 ### Data Migration
 
 Significant schema additions (`Property`, `TripMember`, `InviteCode`, `Expense`, `SettlementPayment`, `Review`). All are new tables — no existing data modification required. However:
+
 - The `Trip` model gains group-trip fields (`preferences` becomes trip-level). Verify via Alembic migration that existing solo trips retain their preferences without data loss
 - Document whether the new `SettlementPayment` schema (with `marked_by`/`confirmed_by`) is backward-compatible with any existing API clients
 
@@ -555,12 +561,14 @@ Significant schema additions (`Property`, `TripMember`, `InviteCode`, `Expense`,
 ### Risks Addressed This Phase (§14)
 
 **Mitigation implemented:**
+
 - **OTA API access denied / rate-parity clauses** — sidestepped by launching on affiliate deep-links + direct boutique partnerships instead of full OTA integration.
 - **Equal split not reflecting actual consumption** — explicitly scoped out as a documented v1 decision, not an oversight; itemized splits deferred to Phase 5.
 - **Multi-member permission boundaries** — addressed via explicit owner/member role enforcement, covered by integration tests, enforced at middleware level.
 - **Join-by-code friction** — accepted trade-off, monitored via the watch metric above rather than pre-emptively engineered around.
 
 **Risk resolved:**
+
 - **Settlement payment gaming** — two-party confirmation model prevents unilateral payment marking.
 
 ### Files after Phase 4 (new since Phase 3)
@@ -632,6 +640,7 @@ This completes the full repo structure specified in §11.
 ### Data Migration
 
 Significant:
+
 - `CrowdSignal` data transitions from heuristic-sourced to ML-model-sourced. The `source` field (`heuristic | first_party | partner_feed`) handles this, but the cutover strategy (shadow mode → full replacement) must be documented. Historical heuristic-sourced records should be preserved for comparison
 - Country-config scaffolding changes how `Trip.country` and `Trip.currency` relate to system configuration — verify backward compatibility with pilot-country data
 - Admin dashboard introduces new access patterns against existing tables — ensure no performance regression on the primary database
@@ -646,6 +655,7 @@ Significant:
 ### Risks Addressed This Phase (§14)
 
 **Risk resolved:**
+
 - **Landmark-tier curation not scaling past a handful of countries** — retired directly by the repeatable curation process above.
 - OTA access risk isn't so much "retired" here as resolved one way or the other, since it's contingent on external partnership terms outside engineering's control.
 

@@ -32,6 +32,7 @@ Our Continuous Integration pipeline ensures code quality and stability. The foll
 ### Pre-Merge Requirements (Required Status Checks)
 
 Every PR must pass the following automated GitHub Actions checks before it can be merged:
+
 - **Linting & Formatting**: Code must meet the project's styling and linting standards.
 - **Unit Tests**: All unit tests (`*.test.ts(x)` for mobile, `test_*.py` for backend) must pass successfully. This explicitly includes tests for:
   - RouteScore calculation and pacing-tier logic
@@ -42,4 +43,5 @@ Every PR must pass the following automated GitHub Actions checks before it can b
 ### Post-Merge / Scheduled Checks
 
 To keep PR turnaround times fast, longer-running UI automation tests are deferred to post-merge workflows:
+
 - **Mobile E2E Tests (Maestro)**: End-to-end user flows (trip setup, tracking session start/stop, expense entry, invite-code join, and offline-mode fallback) are executed nightly on the `main` branch and immediately prior to release builds.

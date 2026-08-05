@@ -7,6 +7,7 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for branching and PR conventi
 ## Project Structure
 
 This repository uses a monorepo structure:
+
 - `apps/mobile/`: React Native (Expo) mobile app.
 - `services/backend/`: FastAPI Python backend (managed by Poetry).
 - `packages/api-types/`: Shared TypeScript types and API client.
@@ -17,6 +18,7 @@ This repository uses a monorepo structure:
 ### Prerequisites
 
 Ensure you have the following installed on your machine:
+
 - [Node.js](https://nodejs.org/) (v20+)
 - [pnpm](https://pnpm.io/) (v9+)
 - [Python](https://www.python.org/) (v3.12+)
@@ -63,4 +65,5 @@ To spin up the required local services (PostgreSQL + PostGIS, Redis, etc.):
 cd infra
 docker compose up -d
 ```
+
 *(Note: `docker-compose.yml` is in progress).*
