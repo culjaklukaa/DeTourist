@@ -81,8 +81,11 @@ async def run_async_migrations() -> None:
 
     await connectable.dispose()
 
+import sys
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
+    if sys.platform == 'win32':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(run_async_migrations())
 
 if context.is_offline_mode():

@@ -2,7 +2,7 @@ import uuid
 import enum
 from datetime import datetime, timezone
 from sqlalchemy import String, DateTime, Enum, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from geoalchemy2 import Geometry
 
@@ -44,3 +44,7 @@ class POI(Base):
         default=lambda: datetime.now(timezone.utc), 
         onupdate=lambda: datetime.now(timezone.utc)
     )
+
+    # Relationships
+    visits = relationship("Visit", back_populates="poi", cascade="all, delete-orphan")
+    crowd_signals = relationship("CrowdSignal", back_populates="poi", cascade="all, delete-orphan")

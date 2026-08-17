@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/detourist"
+    REDIS_URL: str = "redis://localhost:6379/0"
+    
+    # Search
+    MEILISEARCH_URL: str = "http://localhost:7700"
+    MEILISEARCH_MASTER_KEY: str = "masterKey"
 
     # JWT Authentication
     SECRET_KEY: str = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7" # Should be overridden in .env

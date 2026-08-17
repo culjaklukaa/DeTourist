@@ -43,3 +43,4 @@ class Trip(Base):
 
     # Relationships
     user = relationship("User", back_populates="trips")
+    routes = relationship("Route", back_populates="trip", cascade="all, delete-orphan")

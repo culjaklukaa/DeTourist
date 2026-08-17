@@ -3,7 +3,7 @@
 **Date**: August 2026  
 **Phase**: Phase 0 (Data / ML Engineering)  
 **Author**: Data/ML Engineering Team  
-**Status**: Draft — Pending Team Review  
+**Status**: Accepted  
 **Objective**: Establish a defensible, empirically-grounded baseline for time-of-day visitation curves across key POI categories to calibrate the Phase 1A CrowdIndex heuristic (§8.4).
 
 ---

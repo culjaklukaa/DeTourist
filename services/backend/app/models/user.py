@@ -30,3 +30,4 @@ class User(Base):
 
     # Relationships
     trips = relationship("Trip", back_populates="user", cascade="all, delete-orphan")
+    visits = relationship("Visit", back_populates="user", cascade="all, delete-orphan")

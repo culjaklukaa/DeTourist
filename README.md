@@ -49,11 +49,8 @@ cd services/backend
 # Install Python dependencies using Poetry
 poetry install
 
-# Activate the virtual environment
-poetry shell
-
 # Start the development server
-fastapi dev app/main.py
+poetry run uvicorn app.main:app --reload
 ```
 
 ### 3. Infrastructure & Local Services
