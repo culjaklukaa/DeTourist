@@ -3,7 +3,7 @@ from datetime import datetime, timezone, date
 from typing import Optional
 from sqlalchemy import String, ForeignKey, DateTime, Date, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from geoalchemy2 import Geometry
 
 from app.core.database import Base
@@ -31,6 +31,14 @@ class Trip(Base):
     
     start_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     end_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    
+    # User preferences for discovery & route intelligence (§8.1, §8.4)
+    interests: Mapped[list[str]] = mapped_column(
+        ARRAY(Text), nullable=True, default=list
+    )
+    pacing_tier: Mapped[Optional[str]] = mapped_column(
+        String(20), nullable=True, default="moderate"
+    )
     
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

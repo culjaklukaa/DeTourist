@@ -24,6 +24,8 @@ def _build_trip_response(row) -> TripResponse:
         latitude=lat,
         start_date=trip.start_date,
         end_date=trip.end_date,
+        interests=trip.interests,
+        pacing_tier=trip.pacing_tier,
         created_at=trip.created_at,
         updated_at=trip.updated_at
     )

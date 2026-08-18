@@ -1,1 +1,1 @@
-from . import auth, trips, users, routes, pois
+from . import auth, trips, users, routes, pois, discovery

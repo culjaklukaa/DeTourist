@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.core.config import settings
-from app.api.routers import auth, users, trips, routes, pois
+from app.api.routers import auth, users, trips, routes, pois, discovery
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -14,6 +14,7 @@ app.include_router(users.router, prefix=settings.API_V1_STR)
 app.include_router(trips.router, prefix=settings.API_V1_STR)
 app.include_router(routes.router, prefix=f"{settings.API_V1_STR}/routes", tags=["routes"])
 app.include_router(pois.router, prefix=f"{settings.API_V1_STR}/pois", tags=["pois"])
+app.include_router(discovery.router, prefix=f"{settings.API_V1_STR}/discovery", tags=["discovery"])
 
 @app.get("/health", tags=["healthcheck"])
 def health_check():
