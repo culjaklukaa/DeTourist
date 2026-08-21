@@ -25,7 +25,14 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to track your trip and reduce battery usage while stationary.",
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ]
     ]
   }
 }
