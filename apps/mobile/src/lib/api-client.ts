@@ -1,5 +1,4 @@
 import { getToken } from './secureStore';
-import { placeholder } from '@detourist/api-types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
 
@@ -27,11 +26,6 @@ export async function apiClient<T>(
   if (!response.ok) {
     // TODO: Port the 401 auto-refresh logic from axios here if we fully migrate to fetch
     throw new Error(`API Error: ${response.status} ${response.statusText}`);
-  }
-
-  // Placeholder check to ensure we're correctly linking workspace types
-  if (placeholder) {
-    // We can do runtime type validations or logging here later
   }
 
   return response.json() as Promise<T>;

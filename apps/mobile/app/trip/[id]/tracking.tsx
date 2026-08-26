@@ -5,12 +5,11 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Typography, Button, MapLegend } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { Play, Square, Share } from 'lucide-react-native';
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import { Map, Camera, UserLocation } from '@maplibre/maplibre-react-native';
 import { VisitedMapLayer } from '@/features/tracking/VisitedMapLayer';
 import { startAdaptiveTracking, stopTracking } from '@/lib/location';
 
-// Disable telemetry for MapLibre
-MapLibreGL.setTelemetryEnabled(false);
+// Note: Telemetry is not included in maplibre-react-native
 
 const mockCoordinates = [
   [13.4050, 52.5200], // Berlin coords
@@ -70,20 +69,20 @@ export default function TrackingMapScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.surface.brand }]}>
-      <MapLibreGL.MapView
+      <Map
         style={styles.map}
-        styleURL="https://demotiles.maplibre.org/style.json"
-        logoEnabled={false}
+        mapStyle="https://demotiles.maplibre.org/style.json"
+        logo={false}
       >
-        <MapLibreGL.Camera
-          zoomLevel={14}
-          centerCoordinate={mockCoordinates[mockCoordinates.length - 1] || [0, 0]}
+        <Camera
+          zoom={14}
+          center={mockCoordinates[mockCoordinates.length - 1] as [number, number] || [0, 0]}
         />
-        <MapLibreGL.UserLocation visible={true} />
+        <UserLocation />
         
         {/* Render the Visited / Not-Visited Layer */}
         <VisitedMapLayer coordinates={mockCoordinates} showFog={true} />
-      </MapLibreGL.MapView>
+      </Map>
 
       {/* Top action bar */}
       <View style={[styles.topBar, { padding: layout.screenPaddingX, paddingTop: layout.screenPaddingTop }]}>
@@ -166,7 +165,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   map: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   mapPlaceholder: {
     position: 'absolute',

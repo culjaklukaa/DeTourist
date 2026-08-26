@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import MapLibreGL from '@maplibre/maplibre-react-native';
+import { GeoJSONSource, Layer } from '@maplibre/maplibre-react-native';
 import * as turf from '@turf/turf';
 import { useTheme } from '@/theme';
 
@@ -44,7 +44,7 @@ export function VisitedMapLayer({ coordinates, showFog = true }: VisitedMapLayer
         const expandedBbox = [
           bbox[0] - 0.1, bbox[1] - 0.1, 
           bbox[2] + 0.1, bbox[3] + 0.1
-        ];
+        ] as any;
         const fogPolygon = turf.bboxPolygon(expandedBbox);
         
         // Cut out the visited area
@@ -68,42 +68,47 @@ export function VisitedMapLayer({ coordinates, showFog = true }: VisitedMapLayer
   return (
     <>
       {/* 1. Visited Area Path (Solid Line) */}
-      <MapLibreGL.ShapeSource id="visited-path-source" shape={features.path}>
-        <MapLibreGL.LineLayer 
+      <GeoJSONSource id="visited-path-source" data={features.path}>
+        <Layer 
           id="visited-path-layer" 
-          style={{
-            lineColor: colors.primary.main,
-            lineWidth: 4,
-            lineJoin: 'round',
-            lineCap: 'round'
+          type="line"
+          paint={{
+            'line-color': colors.primary.default,
+            'line-width': 4
+          }}
+          layout={{
+            'line-join': 'round',
+            'line-cap': 'round'
           }} 
         />
-      </MapLibreGL.ShapeSource>
+      </GeoJSONSource>
 
       {/* 2. Visited Area Buffer (Optional Highlight) */}
       {features.visitedArea && (
-        <MapLibreGL.ShapeSource id="visited-area-source" shape={features.visitedArea}>
-          <MapLibreGL.FillLayer 
+        <GeoJSONSource id="visited-area-source" data={features.visitedArea}>
+          <Layer 
             id="visited-area-layer" 
-            style={{
-              fillColor: colors.primary.main,
-              fillOpacity: 0.1,
+            type="fill"
+            paint={{
+              'fill-color': colors.primary.default,
+              'fill-opacity': 0.1,
             }} 
           />
-        </MapLibreGL.ShapeSource>
+        </GeoJSONSource>
       )}
 
       {/* 3. Not-Visited Area (Fog of War) */}
       {showFog && features.fog && (
-        <MapLibreGL.ShapeSource id="fog-of-war-source" shape={features.fog}>
-          <MapLibreGL.FillLayer 
+        <GeoJSONSource id="fog-of-war-source" data={features.fog}>
+          <Layer 
             id="fog-of-war-layer" 
-            style={{
-              fillColor: colors.surface.card,
-              fillOpacity: 0.6, // Dim unvisited areas
+            type="fill"
+            paint={{
+              'fill-color': colors.surface.card,
+              'fill-opacity': 0.6, // Dim unvisited areas
             }} 
           />
-        </MapLibreGL.ShapeSource>
+        </GeoJSONSource>
       )}
     </>
   );

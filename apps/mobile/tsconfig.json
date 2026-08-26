@@ -3,6 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": ".",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./src/*"]
     }

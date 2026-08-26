@@ -2,7 +2,7 @@ import * as Network from 'expo-network';
 import { getUnsyncedPings, markPingsSynced } from './storage';
 import { api } from './api';
 
-let syncInterval: NodeJS.Timeout | null = null;
+let syncInterval: ReturnType<typeof setInterval> | null = null;
 let isSyncing = false;
 
 export async function syncGpsPings() {
