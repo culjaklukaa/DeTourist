@@ -1,12 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import * as SplashScreen from 'expo-splash-screen';
 import { useStore } from '../src/store';
 import { initDB } from '../src/lib/storage';
+
+// Prevent the splash screen from auto-hiding
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { isAuthenticated, isLoading, restoreSession } = useStore();
   const segments = useSegments();
   const router = useRouter();
+
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   useEffect(() => {
     initDB().catch(console.error);
@@ -14,7 +32,13 @@ export default function RootLayout() {
   }, [restoreSession]);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (fontsLoaded && !isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, isLoading]);
+
+  useEffect(() => {
+    if (isLoading || !fontsLoaded) return;
 
     const inAuthGroup = segments[0] === '(auth)';
 
@@ -25,10 +49,10 @@ export default function RootLayout() {
       // If logged in and in the auth group, redirect to tabs
       router.replace('/(tabs)/discover');
     }
-  }, [isAuthenticated, isLoading, segments, router]);
+  }, [isAuthenticated, isLoading, fontsLoaded, segments, router]);
 
-  if (isLoading) {
-    // Optionally return a splash screen here
+  if (!fontsLoaded || isLoading) {
+    // Keep splash screen visible while loading
     return null;
   }
 
@@ -36,6 +60,7 @@ export default function RootLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" />
+      <Stack.Screen name="setup" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

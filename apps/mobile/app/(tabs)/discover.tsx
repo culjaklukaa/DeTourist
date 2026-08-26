@@ -5,6 +5,7 @@ import { useTheme } from '@/theme';
 import { getTrips } from '@/features/trips/api';
 import { getDiscoveryRecommendations, RecommendedPOI } from '@/features/discovery/api';
 import { RecommendationCard } from '@/features/discovery/components/RecommendationCard';
+import { DEMO_MODE, MOCK_TRIPS, MOCK_RECOMMENDATIONS } from '@/lib/mockData';
 
 export default function DiscoverScreen() {
   const { colors, spacing, layout } = useTheme();
@@ -20,6 +21,12 @@ export default function DiscoverScreen() {
         setLoading(true);
         setError(null);
         
+        if (DEMO_MODE) {
+          setRecommendations(MOCK_RECOMMENDATIONS as unknown as RecommendedPOI[]);
+          setPacingTier(MOCK_TRIPS[0]?.pacing_tier || 'balanced');
+          return;
+        }
+
         // 1. Fetch user trips
         const trips = await getTrips();
         if (!trips || trips.length === 0) {
