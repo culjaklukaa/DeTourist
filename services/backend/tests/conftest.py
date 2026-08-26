@@ -1,8 +1,12 @@
+import asyncio
+import sys
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from httpx import AsyncClient, ASGITransport
-import asyncio
 import uuid
 import os
 
@@ -22,6 +26,9 @@ TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind
 
 @pytest_asyncio.fixture(scope="session")
 def event_loop():
+    import sys
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
@@ -43,9 +50,11 @@ async def db_session() -> AsyncSession:
 
 @pytest_asyncio.fixture
 async def test_user(db_session: AsyncSession):
+    import uuid
+    user_id = uuid.uuid4()
     user = User(
-        id=uuid.uuid4(),
-        email="test@example.com",
+        id=user_id,
+        email=f"test_{user_id}@example.com",
         hashed_password="hashed",
         is_active=True,
     )

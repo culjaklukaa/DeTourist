@@ -4,7 +4,7 @@ from sqlalchemy import select
 import uuid
 from typing import List
 
-from app.api import deps
+from app.core.database import get_db_session
 from app.models.poi import POI
 from app.schemas.poi import POISearchResponse, POIDetailResponse
 from app.services.search_service import search_service
@@ -30,7 +30,7 @@ async def search_pois(
 @router.get("/{poi_id}", response_model=POIDetailResponse)
 async def get_poi_detail(
     poi_id: uuid.UUID,
-    db: AsyncSession = Depends(deps.get_db)
+    db: AsyncSession = Depends(get_db_session)
 ):
     """
     Fetch full details of a specific POI directly from the PostgreSQL database.
