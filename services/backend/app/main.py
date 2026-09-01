@@ -15,6 +15,8 @@ app.include_router(trips.router, prefix=settings.API_V1_STR)
 app.include_router(routes.router, prefix=f"{settings.API_V1_STR}/routes", tags=["routes"])
 app.include_router(pois.router, prefix=f"{settings.API_V1_STR}/pois", tags=["pois"])
 app.include_router(discovery.router, prefix=f"{settings.API_V1_STR}/discovery", tags=["discovery"])
+from app.api.routers import maps
+app.include_router(maps.router, prefix=f"{settings.API_V1_STR}/maps", tags=["maps"])
 
 @app.get("/health", tags=["healthcheck"])
 def health_check():

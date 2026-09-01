@@ -12,7 +12,7 @@ resource "aws_s3_bucket_cors_configuration" "assets" {
     allowed_headers = ["*"]
     allowed_methods = ["GET", "HEAD"]
     allowed_origins = ["*"] # Restrict in production
-    expose_headers  = []
+    expose_headers  = ["ETag", "Content-Length", "Accept-Ranges", "Content-Range"]
     max_age_seconds = 3000
   }
 }
@@ -41,6 +41,7 @@ resource "aws_cloudfront_distribution" "cdn" {
 
     forwarded_values {
       query_string = true # Needed for signed URLs (receipt images)
+      headers      = ["Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"]
       cookies {
         forward = "none"
       }
