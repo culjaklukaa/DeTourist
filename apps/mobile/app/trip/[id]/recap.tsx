@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, ScrollView, StyleSheet, Share } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import ViewShot from 'react-native-view-shot';
 import { Typography, Button, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { DEMO_MODE, MOCK_RECAP, MockRecapData } from '@/lib/mockData';
+import { shareRecapImage } from '@/lib/share';
 import { Share as ShareIcon, Check, Footprints, MapPin, Clock, Award } from 'lucide-react-native';
+
+import { api } from '@/lib/api';
 
 export default function RecapScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -14,38 +18,56 @@ export default function RecapScreen() {
   const [data, setData] = useState<MockRecapData | null>(null);
 
   useEffect(() => {
-    // In a real app, you'd fetch recap data from the API.
-    // For now, we use the mock data if available, or generate fallback data.
-    if (DEMO_MODE && id && MOCK_RECAP[id]) {
-      setData(MOCK_RECAP[id]);
-    } else {
-      // Fallback dummy data if not found
-      setData({
-        trip_title: 'My Trip',
-        destination: 'Destination',
-        start_date: '2026-01-01',
-        end_date: '2026-01-03',
-        km_walked: 12,
-        places_visited: 5,
-        hours_active: 8,
-        top_category: 'Landmarks',
-        quietest_visit: 'Local Park (CrowdIndex 0.10)',
-      });
+    async function loadData() {
+      if (DEMO_MODE && id && MOCK_RECAP[id as string]) {
+        setData(MOCK_RECAP[id as string]);
+        return;
+      }
+      try {
+        const response = await api.get(`/trips/${id}/recap`);
+        setData(response.data);
+      } catch (error) {
+        console.error('Failed to load real recap data:', error);
+        // Fallback dummy data if not found
+        setData({
+          trip_title: 'My Trip',
+          destination: 'Destination',
+          start_date: '2026-01-01',
+          end_date: '2026-01-03',
+          km_walked: 12,
+          places_visited: 5,
+          hours_active: 8,
+          top_category: 'Landmarks',
+          quietest_visit: 'Local Park (CrowdIndex 0.10)',
+        });
+      }
     }
+    loadData();
   }, [id]);
+
+  const viewShotRef = useRef<any>(null);
 
   const handleShare = async () => {
     if (!data) return;
     try {
-      const days = Math.max(1, Math.ceil((new Date(data.end_date).getTime() - new Date(data.start_date).getTime()) / (1000 * 60 * 60 * 24)));
-      const message = `Check out my trip to ${data.destination}! I visited ${data.places_visited} places and walked ${data.km_walked}km over ${days} days. #DeTourist`;
-      
-      await Share.share({
-        message,
-        title: `${data.trip_title} Recap`,
-      });
+      if (viewShotRef.current && viewShotRef.current.capture) {
+        const uri = await viewShotRef.current.capture();
+        await shareRecapImage(uri);
+      }
     } catch (error) {
-      console.error('Error sharing:', error);
+      console.error('Error sharing image:', error);
+      // Fallback to text sharing
+      try {
+        const days = Math.max(1, Math.ceil((new Date(data.end_date).getTime() - new Date(data.start_date).getTime()) / (1000 * 60 * 60 * 24)));
+        const message = `Check out my trip to ${data.destination}! I visited ${data.places_visited} places and walked ${data.km_walked}km over ${days} days. #DeTourist`;
+        
+        await Share.share({
+          message,
+          title: `${data.trip_title} Recap`,
+        });
+      } catch (fallbackError) {
+        console.error('Fallback sharing failed:', fallbackError);
+      }
     }
   };
 
@@ -69,67 +91,77 @@ export default function RecapScreen() {
       </View>
 
       {/* The "Wrapped" Style Card */}
-      <View style={[
-        styles.recapCard,
-        { 
-          backgroundColor: colors.primary.default, 
-          borderRadius: layout.cardRadius,
-          padding: spacing[6],
-          shadowColor: colors.primary.default,
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.4,
-          shadowRadius: 16,
-          elevation: 12,
-        }
-      ]}>
-        <Typography variant="headingLg" style={{ color: colors.text.inverse, marginBottom: spacing[6] }}>
-          {data.trip_title}
-        </Typography>
+      <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 1.0 }} style={{ width: '100%' }}>
+        <View style={[
+          styles.recapCard,
+          { 
+            backgroundColor: colors.primary.default, 
+            borderRadius: layout.cardRadius,
+            padding: spacing[6],
+            shadowColor: colors.primary.default,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.4,
+            shadowRadius: 16,
+            elevation: 12,
+            overflow: 'hidden',
+          }
+        ]}>
+          <Typography variant="headingLg" style={{ color: colors.text.inverse, marginBottom: spacing[4] }}>
+            {data.trip_title}
+          </Typography>
 
-        <View style={styles.statsGrid}>
-          <View style={styles.statBox}>
-            <MapPin size={24} color={colors.text.inverse} style={{ opacity: 0.8 }} />
-            <Typography variant="displaySm" style={{ color: colors.text.inverse, marginTop: spacing[2] }}>
-              {data.places_visited}
-            </Typography>
-            <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8 }}>
-              Places Visited
+          <View style={styles.imagePlaceholder}>
+            <MapPin size={32} color={colors.text.inverse} style={{ opacity: 0.5 }} />
+            <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8, marginTop: spacing[2] }}>
+              Trip Map & Highlights
             </Typography>
           </View>
 
-          <View style={styles.statBox}>
-            <Footprints size={24} color={colors.text.inverse} style={{ opacity: 0.8 }} />
-            <Typography variant="displaySm" style={{ color: colors.text.inverse, marginTop: spacing[2] }}>
-              {data.km_walked}
-            </Typography>
-            <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8 }}>
-              KM Walked
-            </Typography>
+          <View style={styles.statsGrid}>
+            <View style={styles.statBox}>
+              <MapPin size={24} color={colors.text.inverse} style={{ opacity: 0.8 }} />
+              <Typography variant="displaySm" style={{ color: colors.text.inverse, marginTop: spacing[2] }}>
+                {data.places_visited}
+              </Typography>
+              <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8 }}>
+                Places Visited
+              </Typography>
+            </View>
+
+            <View style={styles.statBox}>
+              <Footprints size={24} color={colors.text.inverse} style={{ opacity: 0.8 }} />
+              <Typography variant="displaySm" style={{ color: colors.text.inverse, marginTop: spacing[2] }}>
+                {data.km_walked}
+              </Typography>
+              <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8 }}>
+                KM Walked
+              </Typography>
+            </View>
+          </View>
+
+          <View style={[styles.statsGrid, { marginTop: spacing[6] }]}>
+            <View style={styles.statBox}>
+              <Clock size={24} color={colors.text.inverse} style={{ opacity: 0.8 }} />
+              <Typography variant="displaySm" style={{ color: colors.text.inverse, marginTop: spacing[2] }}>
+                {data.hours_active}
+              </Typography>
+              <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8 }}>
+                Hours Active
+              </Typography>
+            </View>
+
+            <View style={styles.statBox}>
+              <Award size={24} color={colors.text.inverse} style={{ opacity: 0.8 }} />
+              <Typography variant="headingLg" style={{ color: colors.text.inverse, marginTop: spacing[2] }}>
+                {data.top_category}
+              </Typography>
+              <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8 }}>
+                Top Vibe
+              </Typography>
+            </View>
           </View>
         </View>
-
-        <View style={[styles.statsGrid, { marginTop: spacing[6] }]}>
-          <View style={styles.statBox}>
-            <Clock size={24} color={colors.text.inverse} style={{ opacity: 0.8 }} />
-            <Typography variant="displaySm" style={{ color: colors.text.inverse, marginTop: spacing[2] }}>
-              {data.hours_active}
-            </Typography>
-            <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8 }}>
-              Hours Active
-            </Typography>
-          </View>
-
-          <View style={styles.statBox}>
-            <Award size={24} color={colors.text.inverse} style={{ opacity: 0.8 }} />
-            <Typography variant="headingLg" style={{ color: colors.text.inverse, marginTop: spacing[2] }}>
-              {data.top_category}
-            </Typography>
-            <Typography variant="labelSm" style={{ color: colors.text.inverse, opacity: 0.8 }}>
-              Top Vibe
-            </Typography>
-          </View>
-        </View>
-      </View>
+      </ViewShot>
 
       <Card variant="flat" style={{ backgroundColor: colors.success.bg }}>
         <Typography variant="labelSm" style={{ color: colors.success.text }}>HIDDEN GEM UNLOCKED</Typography>
@@ -174,5 +206,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
+  },
+  imagePlaceholder: {
+    width: '100%',
+    height: 120,
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
   },
 });

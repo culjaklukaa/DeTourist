@@ -100,3 +100,15 @@ class TripResponse(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class TripRecapResponse(BaseModel):
+    trip_title: str
+    destination: str
+    start_date: date
+    end_date: date
+    km_walked: int
+    places_visited: int
+    hours_active: int
+    top_category: str
+    quietest_visit: str
+
