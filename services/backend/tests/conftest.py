@@ -22,7 +22,7 @@ TEST_DATABASE_URL = os.getenv(
 )
 
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=test_engine, class_=AsyncSession)
+TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=test_engine, class_=AsyncSession, expire_on_commit=False)
 
 @pytest_asyncio.fixture(scope="session")
 def event_loop():

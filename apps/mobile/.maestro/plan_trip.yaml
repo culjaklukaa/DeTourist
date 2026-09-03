@@ -1,0 +1,6 @@
+appId: com.detourist.app
+---
+- launchApp
+- assertVisible: "Plan a Trip"
+- tapOn: "Plan a Trip"
+- assertVisible: "Where do you want to go?"

@@ -74,19 +74,70 @@ def _calculate_interest_match(poi: POI, user_preferences: List[str]) -> float:
         return min(1.0, len(overlap) * 0.4)
     return 0.1  # Low match
 
+import struct
+import math
+
+def get_lon_lat_from_wkb(wkb_hex):
+    try:
+        data = bytes.fromhex(wkb_hex)
+        # Check endianness
+        endian = '<' if data[0] == 1 else '>'
+        # Unpack as EWKB Point (SRID included)
+        # byte 0: endian
+        # byte 1-4: type (uint)
+        # byte 5-8: SRID (uint)
+        # byte 9-16: X (double)
+        # byte 17-24: Y (double)
+        # Format string: b I I d d
+        unpacked = struct.unpack(endian + 'bIIdd', data[:25])
+        return unpacked[3], unpacked[4]
+    except Exception:
+        return 0.0, 0.0
+
+def haversine_dist(lon1, lat1, lon2, lat2):
+    R = 6371.0 # Earth radius in km
+    dlon = math.radians(lon2 - lon1)
+    dlat = math.radians(lat2 - lat1)
+    a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
+
 def _calculate_proximity_score(poi: POI, current_route_path: List[POI]) -> float:
     """
     Returns 0.0 to 1.0 based on spatial distance to the last POI in the path.
-    1.0 = adjacent/very close, 0.0 = opposite side of town.
+    1.0 = adjacent/very close (< 500m), 0.0 = opposite side of town (> 10km).
     """
     if not current_route_path:
         return 1.0  # If it's the first POI, distance doesn't matter or is optimal
         
     last_poi = current_route_path[-1]
     
-    # TODO: Implement true Haversine distance or PostGIS ST_Distance using poi.location.
-    # Currently returning a placeholder value for the skeleton implementation.
-    return 0.8 
+    # Extract coordinates from WKB data
+    def get_wkb_hex(loc):
+        if not loc:
+            return None
+        if hasattr(loc, "data"):
+            return loc.data
+        if isinstance(loc, str):
+            return loc
+        return None
+        
+    wkb1 = get_wkb_hex(poi.location)
+    wkb2 = get_wkb_hex(last_poi.location)
+    
+    lon1, lat1 = get_lon_lat_from_wkb(wkb1) if wkb1 else (0.0, 0.0)
+    lon2, lat2 = get_lon_lat_from_wkb(wkb2) if wkb2 else (0.0, 0.0)
+    
+    dist_km = haversine_dist(lon1, lat1, lon2, lat2)
+    
+    # Normalize: < 0.5km is 1.0, > 10km is 0.0
+    if dist_km <= 0.5:
+        return 1.0
+    elif dist_km >= 10.0:
+        return 0.0
+    else:
+        # linear scale between 0.5km and 10km
+        return 1.0 - ((dist_km - 0.5) / 9.5)
 
 def _calculate_novelty_score(poi: POI, pacing_tier: str) -> float:
     """

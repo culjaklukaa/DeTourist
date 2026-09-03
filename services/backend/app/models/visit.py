@@ -20,6 +20,9 @@ class Visit(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
+    trip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("trips.id", ondelete="CASCADE"), nullable=False
+    )
     poi_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("pois.id", ondelete="CASCADE"), nullable=False
     )
@@ -42,4 +45,5 @@ class Visit(Base):
 
     # Relationships
     user = relationship("User", back_populates="visits")
+    trip = relationship("Trip", back_populates="visits")
     poi = relationship("POI", back_populates="visits")

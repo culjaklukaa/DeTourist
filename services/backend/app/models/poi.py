@@ -34,6 +34,10 @@ class POI(Base):
     # Stubbed for Phase 1A (§8.4)
     significance_tier: Mapped[int] = mapped_column(Integer, nullable=True)
     
+    # Spec §7 fields
+    avg_visit_duration_min: Mapped[int] = mapped_column(Integer, nullable=True)
+    country: Mapped[str] = mapped_column(String(100), nullable=True)
+    
     tags: Mapped[dict] = mapped_column(JSONB, nullable=True, default=dict)
     
     created_at: Mapped[datetime] = mapped_column(

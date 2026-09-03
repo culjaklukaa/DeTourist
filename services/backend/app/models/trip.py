@@ -32,6 +32,11 @@ class Trip(Base):
     start_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     end_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     
+    # Spec §7 fields
+    country: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    currency: Mapped[Optional[str]] = mapped_column(String(10), nullable=True, default="BAM")
+    status: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, default="active")
+    
     # User preferences for discovery & route intelligence (§8.1, §8.4)
     interests: Mapped[list[str]] = mapped_column(
         ARRAY(Text), nullable=True, default=list
@@ -52,3 +57,4 @@ class Trip(Base):
     # Relationships
     user = relationship("User", back_populates="trips")
     routes = relationship("Route", back_populates="trip", cascade="all, delete-orphan")
+    visits = relationship("Visit", back_populates="trip", cascade="all, delete-orphan")

@@ -17,6 +17,7 @@ class MockPOI:
         self.category = category
         self.tags = tags or {}
         self.significance_tier = significance_tier
+        self.location = None
 
 def test_calculate_interest_match():
     poi = MockPOI(category="cafe", tags={"amenity": "cafe", "cuisine": "coffee"})
@@ -41,8 +42,8 @@ def test_calculate_proximity_score():
     poi = MockPOI()
     assert _calculate_proximity_score(poi, []) == 1.0
     
-    # Currently a stub returning 0.8
-    assert _calculate_proximity_score(poi, [MockPOI()]) == 0.8
+    # Without locations it returns distance 0.0, which maps to score 1.0
+    assert _calculate_proximity_score(poi, [MockPOI()]) == 1.0
 
 def test_calculate_novelty_score():
     # tier 1 -> 1.0

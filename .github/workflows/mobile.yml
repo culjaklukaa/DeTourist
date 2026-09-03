@@ -48,19 +48,8 @@ jobs:
 
     - name: Lint (Mobile)
       working-directory: apps/mobile
-      run: |
-        # Replace with actual lint scripts when defined in apps/mobile/package.json
-        # pnpm run lint
-        echo "Placeholder for mobile linting"
+      run: pnpm run lint
 
     - name: TypeScript Type Check (Mobile)
       working-directory: apps/mobile
-      run: |
-        # pnpm exec tsc --noEmit
-        echo "Placeholder for mobile type checking"
-
-    - name: Run Unit Tests (Mobile)
-      working-directory: apps/mobile
-      run: |
-        # pnpm run test
-        echo "Placeholder for mobile tests"
+      run: pnpm run typecheck

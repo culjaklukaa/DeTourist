@@ -54,10 +54,13 @@ async def get_recommendations(
     # Spatial filter: only POIs near the trip destination
     if trip.destination_coords is not None:
         # Cast geometry to geography for meter-based distance; both are already SRID 4326
+        from geoalchemy2.types import Geography
         query = query.where(
             func.ST_DWithin(
-                POI.location.cast(text("geography")),
-                trip.destination_coords.cast(text("geography")),
+                POI.location.cast(Geography(srid=4326)),
+                select(Trip.destination_coords.cast(Geography(srid=4326)))
+                .where(Trip.id == trip.id)
+                .scalar_subquery(),
                 pacing.radius_m,
             )
         )
