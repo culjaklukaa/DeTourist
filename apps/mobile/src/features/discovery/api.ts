@@ -11,6 +11,7 @@ export interface ScoreBreakdown {
 export interface RecommendedPOI {
   id: string;
   name: string;
+  image_url?: string;
   category: string;
   significance_tier?: number | null;
   tags: Record<string, any>;

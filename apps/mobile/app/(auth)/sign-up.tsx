@@ -46,6 +46,7 @@ export default function SignUpScreen() {
       if (DEMO_MODE) {
         await new Promise((r) => setTimeout(r, 500));
         await signIn(MOCK_TOKENS.access_token, MOCK_TOKENS.refresh_token);
+        router.replace('/onboarding');
         return;
       }
 
@@ -65,6 +66,7 @@ export default function SignUpScreen() {
       });
 
       await signIn(data.access_token, data.refresh_token);
+      router.replace('/onboarding');
     } catch (err: any) {
       const msg =
         err.response?.data?.detail || err.message || 'Registration failed';

@@ -1,11 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, Modal } from 'react-native';
+import React, { useState, useEffect, Component, ReactNode } from 'react';
+import { View, StyleSheet, SafeAreaView, Modal, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Typography, Button, MapLegend } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { Play, Square, Share } from 'lucide-react-native';
-import { Map, Camera, UserLocation } from '@maplibre/maplibre-react-native';
+import { Play, Square, Share, MapPin } from 'lucide-react-native';
+import { DEMO_MODE } from '@/lib/mockData';
+
+// Conditionally import MapLibre — may fail in Expo Go
+let MapLibre: any = null;
+try {
+  MapLibre = require('@maplibre/maplibre-react-native');
+} catch (e) {
+  console.warn('MapLibre not available:', e);
+}
+
 import { VisitedMapLayer } from '@/features/tracking/VisitedMapLayer';
 import { startAdaptiveTracking, stopTracking } from '@/lib/location';
 
@@ -19,6 +28,61 @@ const mockCoordinates = [
   [13.4090, 52.5225]
 ];
 
+// ── Error Boundary for MapLibre ──────────────────────────────
+interface ErrorBoundaryProps {
+  fallback: ReactNode;
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class MapErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error) {
+    console.warn('MapLibre render error:', error.message);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
+// ── Map Fallback UI ──────────────────────────────────────────
+function MapFallback() {
+  const { colors, spacing } = useTheme();
+  return (
+    <View style={[styles.mapPlaceholder, { backgroundColor: colors.surface.card }]}>
+      <View style={{
+        width: 80, height: 80, borderRadius: 40,
+        backgroundColor: colors.primary.default + '15',
+        justifyContent: 'center', alignItems: 'center',
+      }}>
+        <MapPin size={36} color={colors.primary.default} />
+      </View>
+      <Typography variant="headingSm" color="primary" style={{ marginTop: spacing[4] }}>
+        Map Preview
+      </Typography>
+      <Typography variant="bodySm" color="secondary" style={{ textAlign: 'center', marginTop: spacing[2], paddingHorizontal: spacing[8] }}>
+        Map rendering requires a development build.{'\n'}Use EAS Build for full map support.
+      </Typography>
+    </View>
+  );
+}
+
+// ── Main Screen ──────────────────────────────────────────────
 export default function TrackingMapScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
@@ -40,7 +104,9 @@ export default function TrackingMapScreen() {
 
   const handleEndTrip = async () => {
     if (isTracking) {
-      await stopTracking();
+      if (!DEMO_MODE) {
+        await stopTracking();
+      }
       setIsTracking(false);
     }
     // Navigate to the recap screen
@@ -52,11 +118,35 @@ export default function TrackingMapScreen() {
       setShowOptInModal(true);
       return;
     }
+
+    if (DEMO_MODE) {
+      // Simulate tracking in demo mode — no real location APIs
+      setIsTracking(true);
+      return;
+    }
+
     try {
       await startAdaptiveTracking(id as string || 'active', 'dense');
       setIsTracking(true);
     } catch (e) {
       console.error('Failed to start tracking', e);
+      Alert.alert(
+        'Tracking Error',
+        'Failed to start tracking. Please check your location permissions and try again.'
+      );
+    }
+  };
+
+  const handleStopTracking = async () => {
+    if (DEMO_MODE) {
+      setIsTracking(false);
+      return;
+    }
+    try {
+      await stopTracking();
+      setIsTracking(false);
+    } catch (e) {
+      console.error('Failed to stop tracking', e);
     }
   };
 
@@ -67,22 +157,34 @@ export default function TrackingMapScreen() {
     handleStartTracking();
   };
 
+  // Determine if we can render the native map
+  const canRenderMap = MapLibre && MapLibre.MapView;
+  const NativeMap = canRenderMap ? MapLibre.MapView : null;
+  const NativeCamera = canRenderMap ? MapLibre.Camera : null;
+  const NativeUserLocation = canRenderMap ? MapLibre.UserLocation : null;
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.surface.brand }]}>
-      <Map
-        style={styles.map}
-        mapStyle="https://demotiles.maplibre.org/style.json"
-        logo={false}
-      >
-        <Camera
-          zoom={14}
-          center={mockCoordinates[mockCoordinates.length - 1] as [number, number] || [0, 0]}
-        />
-        <UserLocation />
-        
-        {/* Render the Visited / Not-Visited Layer */}
-        <VisitedMapLayer coordinates={mockCoordinates} showFog={true} />
-      </Map>
+      {canRenderMap ? (
+        <MapErrorBoundary fallback={<MapFallback />}>
+          <NativeMap
+            style={styles.map}
+            mapStyle="https://demotiles.maplibre.org/style.json"
+            logo={false}
+          >
+            <NativeCamera
+              zoom={14}
+              center={mockCoordinates[mockCoordinates.length - 1] as [number, number] || [0, 0]}
+            />
+            <NativeUserLocation />
+            
+            {/* Render the Visited / Not-Visited Layer */}
+            <VisitedMapLayer coordinates={mockCoordinates} showFog={true} />
+          </NativeMap>
+        </MapErrorBoundary>
+      ) : (
+        <MapFallback />
+      )}
 
       {/* Top action bar */}
       <View style={[styles.topBar, { padding: layout.screenPaddingX, paddingTop: layout.screenPaddingTop }]}>
@@ -110,15 +212,10 @@ export default function TrackingMapScreen() {
                 : <Play size={20} color={colors.text.inverse} fill={colors.text.inverse} />
             }
             onPress={async () => {
-              try {
-                if (isTracking) {
-                  await stopTracking();
-                  setIsTracking(false);
-                } else {
-                  await handleStartTracking();
-                }
-              } catch (e) {
-                console.error('Failed to toggle tracking', e);
+              if (isTracking) {
+                await handleStopTracking();
+              } else {
+                await handleStartTracking();
               }
             }}
             style={[{ flex: 1 }, shadows.lg]}

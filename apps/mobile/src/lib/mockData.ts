@@ -26,7 +26,11 @@ export function setDemoMode(enabled: boolean) {
 export const MOCK_USER = {
   id: 'demo-user-001',
   email: 'demo@detourist.app',
+  display_name: 'Demo User',
   is_active: true,
+  interests: ['landmarks', 'food', 'attractions'],
+  default_pace: 'balanced',
+  default_stay_time: 'standard',
   created_at: '2026-06-01T10:00:00Z',
   updated_at: '2026-08-20T14:30:00Z',
 };
@@ -97,6 +101,7 @@ export const MOCK_TRIPS: MockTrip[] = [
 export interface MockRecommendedPOI {
   id: string;
   name: string;
+  image_url: string;
   category: string;
   lat: number;
   lng: number;
@@ -117,6 +122,7 @@ export const MOCK_RECOMMENDATIONS: MockRecommendedPOI[] = [
   {
     id: 'poi-001',
     name: 'Baščaršija',
+    image_url: 'https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?auto=format&fit=crop&q=80&w=800',
     category: 'landmarks',
     lat: 43.8598,
     lng: 18.4310,
@@ -135,6 +141,7 @@ export const MOCK_RECOMMENDATIONS: MockRecommendedPOI[] = [
   {
     id: 'poi-002',
     name: 'Sebilj Fountain',
+    image_url: 'https://images.unsplash.com/photo-1592424002053-21f369ad7fdb?auto=format&fit=crop&q=80&w=800',
     category: 'landmarks',
     lat: 43.8601,
     lng: 18.4313,
@@ -153,6 +160,7 @@ export const MOCK_RECOMMENDATIONS: MockRecommendedPOI[] = [
   {
     id: 'poi-003',
     name: 'Ćevabdžinica Željo',
+    image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800',
     category: 'food',
     lat: 43.8590,
     lng: 18.4298,
@@ -171,6 +179,7 @@ export const MOCK_RECOMMENDATIONS: MockRecommendedPOI[] = [
   {
     id: 'poi-004',
     name: 'Tunnel of Hope Museum',
+    image_url: 'https://images.unsplash.com/photo-1575223970966-76ae61ee7838?auto=format&fit=crop&q=80&w=800',
     category: 'attractions',
     lat: 43.8242,
     lng: 18.3560,
@@ -189,6 +198,7 @@ export const MOCK_RECOMMENDATIONS: MockRecommendedPOI[] = [
   {
     id: 'poi-005',
     name: 'Vrelo Bosne Park',
+    image_url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=800',
     category: 'parks',
     lat: 43.8186,
     lng: 18.2671,
@@ -207,6 +217,7 @@ export const MOCK_RECOMMENDATIONS: MockRecommendedPOI[] = [
   {
     id: 'poi-006',
     name: 'Latin Bridge',
+    image_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&q=80&w=800',
     category: 'landmarks',
     lat: 43.8575,
     lng: 18.4288,
@@ -225,6 +236,7 @@ export const MOCK_RECOMMENDATIONS: MockRecommendedPOI[] = [
   {
     id: 'poi-007',
     name: 'Gazi Husrev-beg Mosque',
+    image_url: 'https://images.unsplash.com/photo-1585129777188-94600bc7b4b3?auto=format&fit=crop&q=80&w=800',
     category: 'landmarks',
     lat: 43.8596,
     lng: 18.4310,
@@ -243,6 +255,7 @@ export const MOCK_RECOMMENDATIONS: MockRecommendedPOI[] = [
   {
     id: 'poi-008',
     name: 'Kazandžiluk (Coppersmith Street)',
+    image_url: 'https://images.unsplash.com/photo-1555921015-5532091f6026?auto=format&fit=crop&q=80&w=800',
     category: 'shopping',
     lat: 43.8594,
     lng: 18.4320,

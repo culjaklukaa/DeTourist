@@ -2,19 +2,20 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Typography, Card, Button } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { MapPin, Users, Plus, Star } from 'lucide-react-native';
+import { MapPin, Users, Plus, Star, Check } from 'lucide-react-native';
 import { RecommendedPOI } from '../api';
 
 interface RecommendationCardProps {
   poi: RecommendedPOI;
+  isAdded?: boolean;
   onAddPress?: () => void;
 }
 
-export function RecommendationCard({ poi, onAddPress }: RecommendationCardProps) {
+export function RecommendationCard({ poi, isAdded, onAddPress }: RecommendationCardProps) {
   const { colors, category, spacing, layout } = useTheme();
 
-  // Generic placeholder since backend doesn't provide image URLs yet
-  const placeholderImage = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800';
+  // Fallback placeholder if the POI doesn't have an image
+  const imageUrl = (poi as any).image_url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800';
 
   // Format the score to a percentage or readable number
   const formattedScore = (poi.score * 10).toFixed(1);
@@ -26,7 +27,7 @@ export function RecommendationCard({ poi, onAddPress }: RecommendationCardProps)
   return (
     <Card variant="elevated" noPadding style={{ overflow: 'hidden' }}>
       <Image 
-        source={{ uri: placeholderImage }} 
+        source={{ uri: imageUrl }} 
         style={{ width: '100%', height: 200, backgroundColor: colors.border.subtle }} 
       />
       
@@ -72,13 +73,23 @@ export function RecommendationCard({ poi, onAddPress }: RecommendationCardProps)
            </Typography>
         </View>
 
-        <Button 
-          label="Add to Route" 
-          variant="secondary" 
-          leftIcon={<Plus size={18} color={colors.primary.default} />}
-          style={{ marginTop: spacing[2] }}
-          onPress={onAddPress}
-        />
+        {isAdded ? (
+          <Button 
+            label="Added ✓" 
+            variant="outline" 
+            leftIcon={<Check size={18} color={colors.success.default || colors.primary.default} />}
+            style={{ marginTop: spacing[2], opacity: 0.7 }}
+            disabled
+          />
+        ) : (
+          <Button 
+            label="Add to Route" 
+            variant="secondary" 
+            leftIcon={<Plus size={18} color={colors.primary.default} />}
+            style={{ marginTop: spacing[2] }}
+            onPress={onAddPress}
+          />
+        )}
         
       </View>
     </Card>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, ScrollView, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { Typography } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { getTrips } from '@/features/trips/api';
@@ -14,6 +14,7 @@ export default function DiscoverScreen() {
   const [error, setError] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<RecommendedPOI[]>([]);
   const [pacingTier, setPacingTier] = useState<string | null>(null);
+  const [addedPois, setAddedPois] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function loadFeed() {
@@ -53,6 +54,15 @@ export default function DiscoverScreen() {
 
     loadFeed();
   }, []);
+
+  const handleAddToRoute = (poiId: string, poiName: string) => {
+    setAddedPois((prev) => {
+      const next = new Set(prev);
+      next.add(poiId);
+      return next;
+    });
+    Alert.alert('Added to Route', `${poiName} has been added to your route.`);
+  };
 
   if (loading) {
     return (
@@ -103,7 +113,8 @@ export default function DiscoverScreen() {
             <RecommendationCard 
               key={poi.id} 
               poi={poi} 
-              onAddPress={() => console.log('Add to route', poi.id)}
+              isAdded={addedPois.has(poi.id)}
+              onAddPress={() => handleAddToRoute(poi.id, poi.name)}
             />
           ))}
         </View>

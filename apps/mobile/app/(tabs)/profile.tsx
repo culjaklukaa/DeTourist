@@ -14,7 +14,8 @@ export default function ProfileScreen() {
   const user = DEMO_MODE ? MOCK_USER : null;
 
   const email = user?.email || 'user@example.com';
-  const initial = email.charAt(0).toUpperCase();
+  const displayName = (user as any)?.display_name || email.split('@')[0];
+  const initial = displayName.charAt(0).toUpperCase();
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString('en-US', {
         month: 'long',
@@ -23,8 +24,8 @@ export default function ProfileScreen() {
     : 'Unknown';
 
   // Demo preferences
-  const selectedInterests = ['landmarks', 'food', 'attractions'];
-  const selectedPace = 'balanced';
+  const selectedInterests = (user as any)?.interests || ['landmarks', 'food', 'attractions'];
+  const selectedPace = (user as any)?.default_pace || 'balanced';
 
   const handleSignOut = async () => {
     await signOut();
@@ -60,8 +61,14 @@ export default function ProfileScreen() {
           </View>
           <View style={{ flex: 1, gap: spacing[1] }}>
             <Typography variant="headingLg" color="primary" numberOfLines={1}>
-              {email}
+              {displayName}
             </Typography>
+            <View style={styles.row}>
+              <Mail size={14} color={colors.icon.inactive} />
+              <Typography variant="bodySm" color="secondary">
+                {email}
+              </Typography>
+            </View>
             <View style={styles.row}>
               <Clock size={14} color={colors.icon.inactive} />
               <Typography variant="bodySm" color="secondary">

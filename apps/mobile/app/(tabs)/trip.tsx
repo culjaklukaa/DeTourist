@@ -1,44 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Typography, Button } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { TripCard } from '@/features/trips/components/TripCard';
-import { getTrips, Trip } from '@/features/trips/api';
-import { DEMO_MODE, MOCK_TRIPS } from '@/lib/mockData';
+import { useStore } from '@/store';
 import { Plus, MapPin } from 'lucide-react-native';
 
 export default function TripScreen() {
   const router = useRouter();
   const { colors, spacing, layout } = useTheme();
 
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const trips = useStore((s) => s.trips);
+  const isLoadingTrips = useStore((s) => s.isLoadingTrips);
+  const tripError = useStore((s) => s.tripError);
+  const fetchTrips = useStore((s) => s.fetchTrips);
 
   useEffect(() => {
-    loadTrips();
+    fetchTrips();
   }, []);
 
-  const loadTrips = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      if (DEMO_MODE) {
-        setTrips(MOCK_TRIPS as unknown as Trip[]);
-      } else {
-        const data = await getTrips();
-        setTrips(data);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load trips');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoadingTrips && trips.length === 0) {
     return (
       <View style={[styles.centerContainer, { backgroundColor: colors.surface.base }]}>
         <ActivityIndicator size="large" color={colors.primary.default} />
@@ -49,14 +31,14 @@ export default function TripScreen() {
     );
   }
 
-  if (error) {
+  if (tripError && trips.length === 0) {
     return (
       <View style={[styles.centerContainer, { backgroundColor: colors.surface.base }]}>
         <Typography variant="headingMd" color="error">Something went wrong</Typography>
         <Typography variant="bodyMd" color="secondary" style={{ textAlign: 'center', marginTop: spacing[2] }}>
-          {error}
+          {tripError}
         </Typography>
-        <Button label="Retry" variant="outline" onPress={loadTrips} style={{ marginTop: spacing[4] }} />
+        <Button label="Retry" variant="outline" onPress={fetchTrips} style={{ marginTop: spacing[4] }} />
       </View>
     );
   }
