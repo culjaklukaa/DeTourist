@@ -13,7 +13,7 @@
 // ────────────────────────────────────────────
 
 /** Set to `true` to use mock data instead of real API calls. */
-export let DEMO_MODE = true;
+export let DEMO_MODE = false;
 
 export function setDemoMode(enabled: boolean) {
   DEMO_MODE = enabled;

@@ -12,7 +12,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Typography, Input, Button, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { useStore } from '@/store';
-import { INTEREST_CATEGORIES, DEMO_MODE } from '@/lib/mockData';
+import { INTEREST_CATEGORIES } from '@/lib/mockData';
 import { Calendar, Compass, Footprints, Tent } from 'lucide-react-native';
 
 const PACING_OPTIONS = [
@@ -255,11 +255,7 @@ export default function SetupScreen() {
           style={{ marginTop: spacing[4] }}
         />
         
-        {DEMO_MODE && (
-          <Typography variant="caption" color="tertiary" style={{ textAlign: 'center' }}>
-            Demo mode — trip will be created locally.
-          </Typography>
-        )}
+
       </ScrollView>
     </KeyboardAvoidingView>
   );

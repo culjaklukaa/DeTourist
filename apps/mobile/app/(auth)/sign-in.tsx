@@ -11,7 +11,6 @@ import { Typography, Input, Button } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { useStore } from '@/store';
 import { api } from '@/lib/api';
-import { DEMO_MODE, MOCK_TOKENS } from '@/lib/mockData';
 import { Compass } from 'lucide-react-native';
 
 export default function SignInScreen() {
@@ -34,13 +33,6 @@ export default function SignInScreen() {
     setError(null);
 
     try {
-      if (DEMO_MODE) {
-        // Simulate a short delay for realism
-        await new Promise((r) => setTimeout(r, 500));
-        await signIn(MOCK_TOKENS.access_token, MOCK_TOKENS.refresh_token);
-        return;
-      }
-
       // Backend uses OAuth2PasswordRequestForm (form-encoded)
       const formData = new URLSearchParams();
       formData.append('username', email.trim());
@@ -133,15 +125,6 @@ export default function SignInScreen() {
             onPress={() => router.push('/(auth)/sign-up')}
           />
 
-          {DEMO_MODE && (
-            <Typography
-              variant="caption"
-              color="tertiary"
-              style={{ textAlign: 'center', marginTop: spacing[2] }}
-            >
-              Demo mode — any credentials will work
-            </Typography>
-          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

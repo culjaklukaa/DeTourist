@@ -11,7 +11,7 @@ import { useRouter } from 'expo-router';
 import { Typography, Input, Button, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { useStore } from '@/store';
-import { INTEREST_CATEGORIES, DEMO_MODE } from '@/lib/mockData';
+import { INTEREST_CATEGORIES } from '@/lib/mockData';
 import { Compass, Footprints, Tent, Clock, User } from 'lucide-react-native';
 
 const PACING_OPTIONS = [
@@ -47,9 +47,7 @@ export default function OnboardingScreen() {
   const handleComplete = async () => {
     setIsLoading(true);
     try {
-      if (DEMO_MODE) {
-        await new Promise((r) => setTimeout(r, 400));
-      }
+
 
       await updateProfile({
         display_name: displayName.trim() || undefined,
@@ -223,11 +221,7 @@ export default function OnboardingScreen() {
           style={{ marginTop: spacing[4] }}
         />
 
-        {DEMO_MODE && (
-          <Typography variant="caption" color="tertiary" style={{ textAlign: 'center' }}>
-            Demo mode — preferences will be saved locally.
-          </Typography>
-        )}
+
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -3,15 +3,14 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import { Typography, Button, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { useStore } from '@/store';
-import { DEMO_MODE, MOCK_USER, INTEREST_CATEGORIES } from '@/lib/mockData';
+import { INTEREST_CATEGORIES } from '@/lib/mockData';
 import { LogOut, Mail, Clock, Compass, Shield } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const { colors, spacing, layout } = useTheme();
   const signOut = useStore((s) => s.signOut);
 
-  // In demo mode, use mock user; otherwise this would come from the user store
-  const user = DEMO_MODE ? MOCK_USER : null;
+  const user = useStore((s) => s.user);
 
   const email = user?.email || 'user@example.com';
   const displayName = (user as any)?.display_name || email.split('@')[0];
@@ -144,15 +143,8 @@ export default function ProfileScreen() {
             </View>
             <View style={[styles.divider, { backgroundColor: colors.border.subtle }]} />
             <View style={styles.infoRow}>
-              <Typography variant="bodyMd" color="secondary">Mode</Typography>
-              <View style={[styles.chip, { backgroundColor: DEMO_MODE ? colors.warning.bg : colors.success.bg }]}>
-                <Typography
-                  variant="labelSm"
-                  style={{ color: DEMO_MODE ? colors.warning.text : colors.success.text }}
-                >
-                  {DEMO_MODE ? 'Demo' : 'Live'}
-                </Typography>
-              </View>
+              <Typography variant="bodyMd" color="secondary">App</Typography>
+              <Typography variant="bodyMd" color="primary">DeTourist</Typography>
             </View>
           </View>
         </Card>

@@ -11,7 +11,6 @@ import { Typography, Input, Button } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { useStore } from '@/store';
 import { api } from '@/lib/api';
-import { DEMO_MODE, MOCK_TOKENS } from '@/lib/mockData';
 import { Compass } from 'lucide-react-native';
 
 export default function SignUpScreen() {
@@ -43,13 +42,6 @@ export default function SignUpScreen() {
     setError(null);
 
     try {
-      if (DEMO_MODE) {
-        await new Promise((r) => setTimeout(r, 500));
-        await signIn(MOCK_TOKENS.access_token, MOCK_TOKENS.refresh_token);
-        router.replace('/onboarding');
-        return;
-      }
-
       // Register the user
       await api.post('/v1/auth/register', {
         email: email.trim(),
@@ -161,15 +153,6 @@ export default function SignUpScreen() {
             onPress={() => router.back()}
           />
 
-          {DEMO_MODE && (
-            <Typography
-              variant="caption"
-              color="tertiary"
-              style={{ textAlign: 'center', marginTop: spacing[2] }}
-            >
-              Demo mode — registration is simulated
-            </Typography>
-          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
