@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken } from './secureStore';
 import { useStore } from '../store';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.2.19:8000';
 
 export const api = axios.create({
   baseURL: API_URL,

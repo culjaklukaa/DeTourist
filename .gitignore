@@ -11,3 +11,4 @@ services/backend/data/raw/
 graphify-out/
 __pycache__/
 *.pyc
+dt/
