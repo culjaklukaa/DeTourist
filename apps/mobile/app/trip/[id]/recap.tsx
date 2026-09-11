@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import ViewShot from 'react-native-view-shot';
 import { Typography, Button, Card } from '@/components/ui';
 import { useTheme } from '@/theme';
-import { DEMO_MODE, MOCK_RECAP, MockRecapData } from '@/lib/mockData';
+import { MockRecapData } from '@/lib/mockData';
 import { shareRecapImage } from '@/lib/share';
 import { Share as ShareIcon, Check, Footprints, MapPin, Clock, Award } from 'lucide-react-native';
 
@@ -19,10 +19,7 @@ export default function RecapScreen() {
 
   useEffect(() => {
     async function loadData() {
-      if (DEMO_MODE && id && MOCK_RECAP[id as string]) {
-        setData(MOCK_RECAP[id as string]);
-        return;
-      }
+
       try {
         const response = await api.get(`/trips/${id}/recap`);
         setData(response.data);

@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand';
 import { api } from '../../lib/api';
-import { DEMO_MODE, MOCK_TRIPS } from '../../lib/mockData';
+
 import type { Trip } from '../../features/trips/api';
 
 export interface CreateTripData {
@@ -32,10 +32,7 @@ export const createTripSlice: StateCreator<TripState> = (set, get) => ({
   fetchTrips: async () => {
     set({ isLoadingTrips: true, tripError: null });
     try {
-      if (DEMO_MODE) {
-        set({ trips: MOCK_TRIPS as unknown as Trip[], isLoadingTrips: false });
-        return;
-      }
+
       const { data } = await api.get<Trip[]>('/v1/trips');
       set({ trips: data, isLoadingTrips: false });
     } catch (err: any) {
@@ -49,26 +46,7 @@ export const createTripSlice: StateCreator<TripState> = (set, get) => ({
   createTrip: async (tripData: CreateTripData) => {
     set({ isLoadingTrips: true, tripError: null });
     try {
-      if (DEMO_MODE) {
-        const newTrip: Trip = {
-          id: `trip-${Date.now()}`,
-          user_id: 'demo-user-001',
-          title: tripData.title,
-          destination_name: tripData.destination_name,
-          start_date: tripData.start_date,
-          end_date: tripData.end_date,
-          interests: tripData.interests,
-          pacing_tier: tripData.pacing_tier,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        set((state) => ({
-          trips: [newTrip, ...state.trips],
-          activeTrip: newTrip,
-          isLoadingTrips: false,
-        }));
-        return newTrip;
-      }
+
 
       const { data } = await api.post<Trip>('/v1/trips', tripData);
       set((state) => ({
@@ -90,9 +68,7 @@ export const createTripSlice: StateCreator<TripState> = (set, get) => ({
 
   deleteTrip: async (id: string) => {
     try {
-      if (!DEMO_MODE) {
-        await api.delete(`/v1/trips/${id}`);
-      }
+      await api.delete(`/v1/trips/${id}`);
       set((state) => ({
         trips: state.trips.filter((t) => t.id !== id),
         activeTrip: state.activeTrip?.id === id ? null : state.activeTrip,
