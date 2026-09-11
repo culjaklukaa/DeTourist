@@ -11,7 +11,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.culjaklukaasteam.detourist",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       }
     },
     "android": {
@@ -29,7 +32,8 @@
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_LOCATION"
       ],
-      "package": "com.culjaklukaasteam.detourist"
+      "package": "com.culjaklukaasteam.detourist",
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -49,9 +53,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "7fe79804-deac-4a85-a4de-eb34a661e24a"
+        "projectId": "d93814d6-ea5a-457c-90e5-c3b2bb7be867"
       }
     },
-    "owner": "culjaklukaas-team"
+    "owner": "detourist"
   }
 }
