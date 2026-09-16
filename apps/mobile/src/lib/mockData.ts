@@ -8,6 +8,16 @@
  * backend is reliably available for demos.
  */
 
+// ────────────────────────────────────────────
+// Demo Mode Toggle
+// ────────────────────────────────────────────
+
+/** Set to `true` to use mock data instead of real API calls. */
+export let DEMO_MODE = true;
+
+export function setDemoMode(enabled: boolean) {
+  DEMO_MODE = enabled;
+}
 
 // ────────────────────────────────────────────
 // Mock User

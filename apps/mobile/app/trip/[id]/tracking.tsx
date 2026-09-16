@@ -5,7 +5,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Typography, Button, MapLegend } from '@/components/ui';
 import { useTheme } from '@/theme';
 import { Play, Square, Share, MapPin } from 'lucide-react-native';
-
+import { DEMO_MODE } from '@/lib/mockData';
 
 // Conditionally import MapLibre — may fail in Expo Go
 let MapLibre: any = null;
@@ -104,7 +104,9 @@ export default function TrackingMapScreen() {
 
   const handleEndTrip = async () => {
     if (isTracking) {
-      await stopTracking();
+      if (!DEMO_MODE) {
+        await stopTracking();
+      }
       setIsTracking(false);
     }
     // Navigate to the recap screen
@@ -117,7 +119,11 @@ export default function TrackingMapScreen() {
       return;
     }
 
-
+    if (DEMO_MODE) {
+      // Simulate tracking in demo mode — no real location APIs
+      setIsTracking(true);
+      return;
+    }
 
     try {
       await startAdaptiveTracking(id as string || 'active', 'dense');
@@ -132,7 +138,10 @@ export default function TrackingMapScreen() {
   };
 
   const handleStopTracking = async () => {
-
+    if (DEMO_MODE) {
+      setIsTracking(false);
+      return;
+    }
     try {
       await stopTracking();
       setIsTracking(false);
