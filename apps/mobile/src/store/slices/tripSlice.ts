@@ -62,6 +62,7 @@ export const createTripSlice: StateCreator<TripState> = (set, get) => ({
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
+        MOCK_TRIPS.unshift(newTrip as any);
         set((state) => ({
           trips: [newTrip, ...state.trips],
           activeTrip: newTrip,
@@ -90,7 +91,10 @@ export const createTripSlice: StateCreator<TripState> = (set, get) => ({
 
   deleteTrip: async (id: string) => {
     try {
-      if (!DEMO_MODE) {
+      if (DEMO_MODE) {
+        const index = MOCK_TRIPS.findIndex(t => t.id === id);
+        if (index > -1) MOCK_TRIPS.splice(index, 1);
+      } else {
         await api.delete(`/v1/trips/${id}`);
       }
       set((state) => ({

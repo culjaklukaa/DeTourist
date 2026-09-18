@@ -46,6 +46,7 @@ export const createUserSlice: StateCreator<UserState> = (set) => ({
   updateProfile: async (profileData) => {
     try {
       if (DEMO_MODE) {
+        Object.assign(MOCK_USER, profileData);
         set((state) => ({
           user: state.user ? { ...state.user, ...profileData } : null,
         }));

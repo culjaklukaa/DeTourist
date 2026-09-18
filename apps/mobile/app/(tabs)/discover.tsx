@@ -23,6 +23,10 @@ export default function DiscoverScreen() {
         setError(null);
         
         if (DEMO_MODE) {
+          if (MOCK_TRIPS.length === 0) {
+            setRecommendations([]);
+            return;
+          }
           setRecommendations(MOCK_RECOMMENDATIONS as unknown as RecommendedPOI[]);
           setPacingTier(MOCK_TRIPS[0]?.pacing_tier || 'balanced');
           return;
