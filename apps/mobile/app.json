@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "DeTourist",
-    "slug": "detourist",
+    "slug": "luka",
     "version": "1.0.0",
     "scheme": "detourist",
     "orientation": "portrait",
@@ -56,9 +56,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "d93814d6-ea5a-457c-90e5-c3b2bb7be867"
+        "projectId": "3357c5f3-c35e-4e28-8b63-dbc1d1aed0de"
       }
     },
-    "owner": "detourist"
+    "owner": "culjaklukas-team"
   }
 }
