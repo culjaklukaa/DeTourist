@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Typography, Card, Button } from '@/components/ui';
 import { useTheme } from '@/theme';
@@ -11,11 +11,39 @@ interface RecommendationCardProps {
   onAddPress?: () => void;
 }
 
+// Simple in-memory cache to avoid repeated API calls for the same POI
+const imageCache: Record<string, string> = {};
+
 export function RecommendationCard({ poi, isAdded, onAddPress }: RecommendationCardProps) {
   const { colors, category, spacing, layout } = useTheme();
 
-  // Fallback placeholder if the POI doesn't have an image
-  const imageUrl = (poi as any).image_url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800';
+  const fallbackImage = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800';
+  const [imageUrl, setImageUrl] = useState<string>((poi as any).image_url || imageCache[poi.name] || fallbackImage);
+
+  useEffect(() => {
+    if ((poi as any).image_url || imageCache[poi.name]) return;
+
+    let isMounted = true;
+    async function fetchImage() {
+      try {
+        const query = encodeURIComponent(poi.name);
+        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${query}`);
+        if (!res.ok) return;
+        
+        const data = await res.json();
+        const src = data.thumbnail?.source || data.originalimage?.source;
+        if (src && isMounted) {
+          imageCache[poi.name] = src;
+          setImageUrl(src);
+        }
+      } catch (err) {
+        // Silently fail and keep fallback image
+      }
+    }
+    fetchImage();
+
+    return () => { isMounted = false; };
+  }, [poi.name, (poi as any).image_url]);
 
   // Format the score to a percentage or readable number
   const formattedScore = (poi.score * 10).toFixed(1);

@@ -69,12 +69,12 @@ api.interceptors.response.use(
 
       try {
         // Assume backend expects the refresh token in the body
-        const { data } = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken,
+        const { data } = await axios.post(`${API_URL}/v1/auth/refresh`, {
+          refresh_token: refreshToken,
         });
 
-        const newAccessToken = data.accessToken;
-        const newRefreshToken = data.refreshToken;
+        const newAccessToken = data.access_token;
+        const newRefreshToken = data.refresh_token;
 
         await useStore.getState().signIn(newAccessToken, newRefreshToken);
         api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;

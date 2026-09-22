@@ -5,6 +5,7 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.routers import auth, users, trips, routes, pois, discovery, visits, crowd_signals, maps
@@ -13,6 +14,15 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Backend for DeTourist",
     version="0.1.0",
+)
+
+# Allow the mobile app (and dev tools) to reach the API from any origin.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],          # tighten in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router, prefix=settings.API_V1_STR)

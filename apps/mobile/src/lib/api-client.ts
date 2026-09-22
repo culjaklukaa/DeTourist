@@ -1,6 +1,6 @@
 import { getToken } from './secureStore';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://http://192.168.2.19:8000/api';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.2.19:8000';
 
 /**
  * A typed fetch wrapper stub wired to @detourist/api-types.
