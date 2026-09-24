@@ -5,6 +5,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Typography, Input, Button } from '@/components/ui';
@@ -13,6 +14,9 @@ import { useStore } from '@/store';
 import { api } from '@/lib/api';
 import { DEMO_MODE, MOCK_TOKENS } from '@/lib/mockData';
 import { Compass } from 'lucide-react-native';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const logoImage = require('../../assets/DeTourist_logo.jpeg');
 
 export default function SignInScreen() {
   const router = useRouter();
@@ -25,7 +29,7 @@ export default function SignInScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSignIn = async () => {
-    if (!email.trim() || !password.trim()) {
+    if (!DEMO_MODE && (!email.trim() || !password.trim())) {
       setError('Please enter both email and password.');
       return;
     }
@@ -61,6 +65,44 @@ export default function SignInScreen() {
     }
   };
 
+  // ── DEMO_MODE: Welcome / splash screen ──
+  if (DEMO_MODE) {
+    return (
+      <View style={[styles.welcomeContainer, { backgroundColor: colors.surface.base }]}>
+        <View style={styles.welcomeContent}>
+          <Image
+            source={logoImage}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Typography
+            variant="displayLg"
+            color="primary"
+            style={{ marginTop: spacing[6], textAlign: 'center' }}
+          >
+            DeTourist
+          </Typography>
+          <Typography
+            variant="bodyLg"
+            color="secondary"
+            style={{ marginTop: spacing[2], textAlign: 'center' }}
+          >
+            AI vodič koji zna gdje i kada
+          </Typography>
+        </View>
+
+        <View style={{ paddingHorizontal: layout.screenPaddingX, paddingBottom: spacing[12], width: '100%' }}>
+          <Button
+            label="Započni"
+            onPress={handleSignIn}
+            loading={isLoading}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  // ── Normal (non-demo) login form ──
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -132,16 +174,6 @@ export default function SignInScreen() {
             variant="ghost"
             onPress={() => router.push('/(auth)/sign-up')}
           />
-
-          {DEMO_MODE && (
-            <Typography
-              variant="caption"
-              color="tertiary"
-              style={{ textAlign: 'center', marginTop: spacing[2] }}
-            >
-              Demo mode — any credentials will work
-            </Typography>
-          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -149,6 +181,7 @@ export default function SignInScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Normal login styles
   container: { flex: 1 },
   content: { flexGrow: 1 },
   header: {
@@ -164,5 +197,22 @@ const styles = StyleSheet.create({
   errorBanner: {
     padding: 12,
     borderRadius: 8,
+  },
+  // Demo welcome styles
+  welcomeContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  welcomeContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    borderRadius: 24,
   },
 });
